@@ -1,0 +1,8 @@
+This project builds itself using net.didierverna.clon: if you can load
+the asdf system, the function [[file:main.lisp::defun dump]] will create a
+standalone binary with all the dependencies. The arguments to this
+binary can be found via the =--help= switch or by looking at
+[[file:main.lisp::defsynopsis]].  For now, all this does is watch stacks
+that are in transitioning stages (=--watch=) and exits when they are
+done, showing the parameters passed to the stack and the outputs it
+returns.
