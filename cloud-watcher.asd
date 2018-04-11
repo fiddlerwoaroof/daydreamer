@@ -14,7 +14,12 @@
                  #:fwoar.lisputils
                  #:net.didierverna.clon
                  #:cl-base64
+                 #:local-time
+                 #:local-time-duration
                  #:aws-sdk/services/cloudformation
+                 #:aws-sdk/services/elasticmapreduce
                  #:should-test)
     :serial t
-    :components ((:file "main")))
+    :components ((:file "aws-result")
+                 (:file "main")
+                 (:file "cli")))

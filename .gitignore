@@ -1,3 +1,5 @@
 *.fasl
 *~
 /cloud-watcher
+/gp.run
+nohup.out

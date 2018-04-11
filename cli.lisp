@@ -1,0 +1,46 @@
+(defpackage :cloud-watcher.cli
+  (:import-from :cloud-watcher.main :stack-parameters :stack-outputs :stack-for-name)
+  (:import-from :cloud-watcher.aws-result :start-date-time :end-date-time)
+  (:import-from :serapeum :op)
+  (:import-from :clon :defsynopsis :group :flag :stropt)
+  (:use :cl)
+  (:export options
+           #:*cloud-watcher-synopsis*
+           #:dump))
+
+(in-package :cloud-watcher.cli)
+
+(defparameter *cloud-watcher-synopsis*
+  (defsynopsis (:postfix "ARGS...")
+    (group (:header "actions")
+           (flag :short-name "p" :long-name "parameters" :description "show stack parameters")
+           (flag :short-name "o" :long-name "outputs" :description "show stack outputs")
+           (flag :short-name "w" :long-name "watch" :description "watch a cloudformation stack until it's done processing")
+           (flag :short-name "s" :long-name "start")
+           (stropt :long-name "aws-region" :default-value "us-west-2")
+           (flag :short-name "u" :long-name "update"))
+    (group (:header "misc")
+           (flag :long-name "help"))))
+
+(defun stack-parameters-main (name)
+  (stack-parameters (stack-for-name name)))
+
+(defun stack-outputs-main (name)
+  (stack-outputs (stack-for-name name)))
+
+(defun main ()
+  (let* ((context (net.didierverna.clon:make-context :synopsis *cloud-watcher-synopsis*))
+         (files (clon:remainder :context context))
+         (region (clon:getopt :long-name "aws-region"))
+         (aws-sdk/api:*session* (aws-sdk/session:make-session :region region)))
+
+    (format *error-output* "~&IN REGION: ~a~%" region)
+
+    (cond ((clon:getopt :long-name "help") (clon:help))
+          ((clon:getopt :long-name "watch") (cloud-watcher.main:watch-stack (car files)))
+          ((clon:getopt :long-name "outputs") (stack-outputs-main (car files)))
+          ((clon:getopt :long-name "parameters") (stack-parameters-main (car files))))))
+
+(defun dump ()
+  "Create an executable with the command-line interface defined above."
+  (clon:dump "cloud-watcher" main))
