@@ -23,7 +23,8 @@
    #:extract-timeline
    #:extract-list
    #:extract-stack
-   #:timeline))
+   #:timeline
+   #:tagged-kv-formatter))
 (in-package :cloud-watcher.aws-result)
 
 (defun find-all-indices (pred str &optional accum (start (or (car accum) 0)))
@@ -54,13 +55,6 @@
                         (if (/= (car indices) 0) indices (append (cdr indices)
                                                                  (list (length v)))))))
     (serapeum:string-join parts "-")))
-
-(deftest decamelize ()
-  (should be equal "a" (decamelize "A"))
-  (should be equal "a" (decamelize "a"))
-  (should be equal "outputs" (decamelize "Outputs"))
-  (should be equal "outputs-outputs" (decamelize "OutputsOutputs"))
-  (should be equal "a-b-c" (decamelize "ABC")))
 
 
 (defmacro tagged-kv-formatter (tag)
@@ -156,3 +150,11 @@
     (setf s-sdt (initialize-date s-sdt)
           s-edt (initialize-date s-edt)
           s-cdt (initialize-date s-cdt))))
+
+
+(deftest decamelize ()
+  (should be equal "a" (decamelize "A"))
+  (should be equal "a" (decamelize "a"))
+  (should be equal "outputs" (decamelize "Outputs"))
+  (should be equal "outputs-outputs" (decamelize "OutputsOutputs"))
+  (should be equal "a-b-c" (decamelize "ABC")))

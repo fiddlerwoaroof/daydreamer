@@ -3,7 +3,7 @@
   (:import-from :cloud-watcher.aws-result :start-date-time :end-date-time)
   (:import-from :serapeum :op)
   (:import-from :clon :defsynopsis :group :flag :stropt)
-  (:use :cl)
+  (:use :cl :st)
   (:export options
            #:*cloud-watcher-synopsis*
            #:dump))
@@ -20,6 +20,8 @@
            (stropt :long-name "aws-region" :default-value "us-west-2")
            (flag :short-name "u" :long-name "update"))
     (group (:header "misc")
+           (flag :long-name "rebuild")
+           (flag :long-name "self-test")
            (flag :long-name "help"))))
 
 (defun stack-parameters-main (name)
@@ -27,6 +29,23 @@
 
 (defun stack-outputs-main (name)
   (stack-outputs (stack-for-name name)))
+
+(defun run-tests ()
+  (st:test :package (find-package :cloud-watcher.aws-result))
+  (st:test :package (find-package :cloud-watcher.main))
+  (st:test :package (find-package :cloud-watcher.cli)))
+
+(defun dump ()
+  "Create an executable with the command-line interface defined above."
+  (handler-bind ((sb-ext:name-conflict (lambda (c)
+                                         (declare (ignore c))
+                                         (invoke-restart-interactively 'sb-ext:resolve-conflict))))
+    (let ((sb-ext:*on-package-variance* '(:warn (:cloud-watcher.aws-result
+                                                 :cloud-watcher.main
+                                                 :cloud-watcher.cli)
+                                          :error t)))
+      (asdf:load-system :cloud-watcher :force t)))
+  (clon:dump "cloud-watcher" main))
 
 (defun main ()
   (let* ((context (net.didierverna.clon:make-context :synopsis *cloud-watcher-synopsis*))
@@ -39,8 +58,6 @@
     (cond ((clon:getopt :long-name "help") (clon:help))
           ((clon:getopt :long-name "watch") (cloud-watcher.main:watch-stack (car files)))
           ((clon:getopt :long-name "outputs") (stack-outputs-main (car files)))
-          ((clon:getopt :long-name "parameters") (stack-parameters-main (car files))))))
-
-(defun dump ()
-  "Create an executable with the command-line interface defined above."
-  (clon:dump "cloud-watcher" main))
+          ((clon:getopt :long-name "parameters") (stack-parameters-main (car files)))
+          ((clon:getopt :long-name "self-test") (run-tests))
+          ((clon:getopt :long-name "rebuild") (dump)))))

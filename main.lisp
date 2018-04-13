@@ -43,27 +43,50 @@
     (local-time-duration:timestamp-difference (end-date-time timeline)
                                               (start-date-time timeline))))
 
+(defun every-five-seconds (cb args &optional (delay-function #'sleep))
+  (loop
+     while (apply cb args)
+     do (funcall delay-function 5)))
+
+(deftest every-five-seconds ()
+  (let ((counter 0)
+        delay)
+    (flet ((fake-delay (num)
+             (incf counter)
+             (setf delay num))
+           (work ()
+             (< counter 10)))
+      (every-five-seconds #'work () #'fake-delay)
+      (should be = 10 counter)
+      (should be = 5 delay))))
+
+(defclass stack-watcher ()
+  ())
+
 (defun watch-stack (name)
   (format t "~&Watching ~s~2%" name)
-  (let ((done? nil)
-        (old-status nil))
-    (loop until done?
-       for the-stack = (stack-for-name name)
-       do
-         (unless old-status
-           (format t "~& PARAMETERS ~%============~%")
-           (stack-parameters the-stack)
-           (format t "~&============~2%"))
+  (block nil
+    (let ((old-status nil))
+      (every-five-seconds
+       (lambda ()
+         (let* ((the-stack (stack-for-name name))
+                (current-status (stack-status the-stack)))
+           (unless old-status
+             (format t "~& PARAMETERS ~%============~%")
+             (stack-parameters the-stack)
+             (format t "~&============~2%"))
 
-         (unless (eql old-status (stack-status the-stack))
-           (format t "~&STATUS ~a~%" (stack-status the-stack))
-           (setf old-status (stack-status the-stack)))
+           (unless (eql old-status current-status)
+             (format t "~&STATUS ~a~%" current-status)
+             (setf old-status current-status))
 
-         (if (ends-with-subseq "COMPLETE" (symbol-name (stack-status the-stack)))
-             (progn
-               (format t "~2& OUTPUTS ~%=========~%")
-               (stack-outputs the-stack)
-               (format t "~&=========~%")
-               (return)))
-         (sleep 5)))
+           (if (ends-with-subseq "COMPLETE" (symbol-name current-status))
+               (progn
+                 (format t "~2& OUTPUTS ~%=========~%")
+                 (stack-outputs the-stack)
+                 (format t "~&=========~%")
+                 nil)
+               t)))
+       ())))
   (fresh-line))
+
