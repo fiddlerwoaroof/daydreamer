@@ -45,7 +45,8 @@
 
 (defun every-five-seconds (cb args &optional (delay-function #'sleep))
   (loop
-     while (apply cb args)
+     for (continue? . next-args) = (multiple-value-list (apply cb args)) then (multiple-value-list (apply cb next-args))
+     while continue?
      do (funcall delay-function 5)))
 
 (deftest every-five-seconds ()
@@ -58,35 +59,59 @@
              (< counter 10)))
       (every-five-seconds #'work () #'fake-delay)
       (should be = 10 counter)
+      (should be = 5 delay)))
+
+  (let (delay
+        (count 0)
+        (counters ()))
+    (flet ((fake-delay (num)
+             (setf delay num))
+           (work (counter)
+             ;; temporary for initial red...
+             (if (> count 10)
+                 (throw 'quit nil)
+                 (incf count))
+
+             (push counter counters)
+             (values (< counter 10)
+                     (1+ counter))))
+      (catch 'quit
+        (every-five-seconds #'work '(0) #'fake-delay))
+      (should be equal
+              (alexandria:iota 11 :start 10 :step -1)
+              counters)
       (should be = 5 delay))))
 
-(defclass stack-watcher ()
-  ())
+(defun parameter-block (the-stack)
+  (format t "~& PARAMETERS ~%============~%")
+  (stack-parameters the-stack)
+  (format t "~&============~2%"))
+
+(defun output-block (the-stack)
+  (format t "~2& OUTPUTS ~%=========~%")
+  (stack-outputs the-stack)
+  (format t "~&=========~%")
+  (values))
+
+(defun stack-info (the-stack)
+  (lambda (old-status)
+    (unless old-status
+      (parameter-block the-stack))
+
+    (let ((current-status (stack-status the-stack)))
+      (unless (eql old-status current-status)
+        (format t "~&STATUS ~a~%" current-status)
+        (setf old-status current-status))
+
+      (values (if (ends-with-subseq "COMPLETE" (symbol-name current-status))
+                  (output-block the-stack)
+                  t)
+              current-status))))
 
 (defun watch-stack (name)
-  (format t "~&Watching ~s~2%" name)
-  (block nil
-    (let ((old-status nil))
-      (every-five-seconds
-       (lambda ()
-         (let* ((the-stack (stack-for-name name))
-                (current-status (stack-status the-stack)))
-           (unless old-status
-             (format t "~& PARAMETERS ~%============~%")
-             (stack-parameters the-stack)
-             (format t "~&============~2%"))
-
-           (unless (eql old-status current-status)
-             (format t "~&STATUS ~a~%" current-status)
-             (setf old-status current-status))
-
-           (if (ends-with-subseq "COMPLETE" (symbol-name current-status))
-               (progn
-                 (format t "~2& OUTPUTS ~%=========~%")
-                 (stack-outputs the-stack)
-                 (format t "~&=========~%")
-                 nil)
-               t)))
-       ())))
-  (fresh-line))
+  (let ((the-stack (stack-for-name name)))
+    (format t "~&Watching ~s~2%" name)
+    (every-five-seconds (stack-info the-stack)
+                        (list nil))
+    (fresh-line)))
 
