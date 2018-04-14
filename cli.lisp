@@ -1,5 +1,5 @@
 (defpackage :cloud-watcher.cli
-  (:import-from :cloud-watcher.main :stack-parameters :stack-outputs :stack-for-name)
+  (:import-from :cloud-watcher.main :stack-parameters :stack-outputs :stack-for-name :stack-info)
   (:import-from :cloud-watcher.aws-result :start-date-time :end-date-time)
   (:import-from :serapeum :op)
   (:import-from :clon :defsynopsis :group :flag :stropt)
@@ -16,6 +16,8 @@
            (flag :short-name "p" :long-name "parameters" :description "show stack parameters")
            (flag :short-name "o" :long-name "outputs" :description "show stack outputs")
            (flag :short-name "w" :long-name "watch" :description "watch a cloudformation stack until it's done processing")
+           (flag :short-name "i" :long-name "info" :description "get parameters, status and output of a stack")
+           #+null
            (flag :short-name "s" :long-name "start")
            (stropt :long-name "aws-region" :default-value "us-west-2")
            (flag :short-name "u" :long-name "update"))
@@ -29,6 +31,9 @@
 
 (defun stack-outputs-main (name)
   (stack-outputs (stack-for-name name)))
+
+(defun stack-info-main (name)
+  (stack-info (stack-for-name name)))
 
 (defun run-tests ()
   (st:test :package (find-package :cloud-watcher.aws-result))
@@ -56,6 +61,7 @@
     (format *error-output* "~&IN REGION: ~a~%" region)
 
     (cond ((clon:getopt :long-name "help") (clon:help))
+          ((clon:getopt :long-name "info") (stack-info-main (car files)))
           ((clon:getopt :long-name "watch") (cloud-watcher.main:watch-stack (car files)))
           ((clon:getopt :long-name "outputs") (stack-outputs-main (car files)))
           ((clon:getopt :long-name "parameters") (stack-parameters-main (car files)))

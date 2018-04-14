@@ -9,7 +9,8 @@
            #:stack-parameters
            #:stack-outputs
            #:stack-for-name
-           #:watch-stack))
+           #:watch-stack
+           #:stack-info))
 
 (in-package :cloud-watcher.main)
 
@@ -121,6 +122,9 @@
     (setf (stack stack-formatter) (refresh-stack (stack stack-formatter)))
     stack-formatter))
 
+(defmethod old-status ((stack cloud-watcher.aws-result:stack))
+  nil)
+
 (defun stack-info (the-stack)
   (with-accessors ((old-status old-status)) the-stack
     (let* ((current-status (stack-status the-stack)))
@@ -134,12 +138,15 @@
           (output-block the-stack)
           t))))
 
+(defun refreshing (refresh-function cb)
+  (lambda (thing)
+    (let ((refreshed-thing (funcall refresh-function thing)))
+      (values (funcall cb refreshed-thing)
+              refreshed-thing))))
+
 (defun watch-stack (name)
   (format t "~&Watching ~s~2%" name)
-  (every-five-seconds (lambda (stale-stack)
-                        (let ((the-stack (refresh-stack stale-stack)))
-                          (values (stack-info the-stack)
-                                  the-stack)))
+  (every-five-seconds (refreshing 'refresh-stack 'stack-info)
                       (list name))
   (fresh-line))
 
