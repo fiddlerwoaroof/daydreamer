@@ -93,25 +93,24 @@
   (format t "~&=========~%")
   (values))
 
-(defun stack-info (the-stack)
-  (lambda (old-status)
+(defun stack-info (name old-status)
+  (let* ((the-stack (stack-for-name name))
+         (current-status (stack-status the-stack)))
     (unless old-status
       (parameter-block the-stack))
 
-    (let ((current-status (stack-status the-stack)))
-      (unless (eql old-status current-status)
-        (format t "~&STATUS ~a~%" current-status)
-        (setf old-status current-status))
+    (unless (equal old-status current-status)
+      (format t "~&STATUS ~a~%" old-status current-status))
 
-      (values (if (ends-with-subseq "COMPLETE" (symbol-name current-status))
-                  (output-block the-stack)
-                  t)
-              current-status))))
+    (values (if (ends-with-subseq "COMPLETE" (symbol-name current-status))
+                (output-block the-stack)
+                t)
+            name
+            current-status)))
 
 (defun watch-stack (name)
-  (let ((the-stack (stack-for-name name)))
-    (format t "~&Watching ~s~2%" name)
-    (every-five-seconds (stack-info the-stack)
-                        (list nil))
-    (fresh-line)))
+  (format t "~&Watching ~s~2%" name)
+  (every-five-seconds 'stack-info
+                      (list name nil))
+  (fresh-line))
 
