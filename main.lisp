@@ -93,24 +93,53 @@
   (format t "~&=========~%")
   (values))
 
-(defun stack-info (name old-status)
-  (let* ((the-stack (stack-for-name name))
-         (current-status (stack-status the-stack)))
-    (unless old-status
-      (parameter-block the-stack))
+(defclass stack-formatter ()
+  ((%stack :initarg :stack :accessor stack)
+   (%old-status :initarg :old-status :accessor old-status :initform nil)))
 
-    (unless (equal old-status current-status)
-      (format t "~&STATUS ~a~%" old-status current-status))
+(defmethod stack-status ((stack-formatter stack-formatter))
+  (when (slot-boundp stack-formatter '%stack)
+    (stack-status (stack stack-formatter))))
 
-    (values (if (ends-with-subseq "COMPLETE" (symbol-name current-status))
-                (output-block the-stack)
-                t)
-            name
-            current-status)))
+(defmethod parameters ((stack-formatter stack-formatter))
+  (when (slot-boundp stack-formatter '%stack)
+    (parameters (stack stack-formatter))))
+
+(defmethod outputs ((stack-formatter stack-formatter))
+  (when (slot-boundp stack-formatter '%stack)
+    (outputs (stack stack-formatter))))
+
+(defmethod (setf stack) :before (new-value (object stack-formatter))
+  (setf (old-status object) (stack-status object)))
+
+(defgeneric refresh-stack (stack-formatter)
+  (:method ((stack cloud-watcher.aws-result:stack))
+    (stack-for-name (stack-name stack))) 
+  (:method ((stack-formatter string))
+    (make-instance 'stack-formatter :stack (stack-for-name stack-formatter)))
+  (:method ((stack-formatter stack-formatter))
+    (setf (stack stack-formatter) (refresh-stack (stack stack-formatter)))
+    stack-formatter))
+
+(defun stack-info (the-stack)
+  (with-accessors ((old-status old-status)) the-stack
+    (let* ((current-status (stack-status the-stack)))
+      (unless old-status
+        (parameter-block the-stack))
+
+      (unless (equal old-status current-status)
+        (format t "~&STATUS ~a~%" current-status))
+
+      (if (ends-with-subseq "COMPLETE" (symbol-name current-status))
+          (output-block the-stack)
+          t))))
 
 (defun watch-stack (name)
   (format t "~&Watching ~s~2%" name)
-  (every-five-seconds 'stack-info
-                      (list name nil))
+  (every-five-seconds (lambda (stale-stack)
+                        (let ((the-stack (refresh-stack stale-stack)))
+                          (values (stack-info the-stack)
+                                  the-stack)))
+                      (list name))
   (fresh-line))
 
