@@ -73,8 +73,9 @@
 
 
 (defclass stack ()
-  ((%outputs :initarg :outputs :reader outputs)
+  ((%outputs :initarg :outputs :reader outputs :initform (list))
    (%capabilities :initarg :capabilities :reader capabilities)
+   (%last-updated-time :initarg :last-updated-time :reader last-updated-time)
    (%creation-time :initarg :creation-time :reader creation-time)
    (%notification-arns :initarg :notification-arns :reader notification-arns)
    (%stack-id :initarg :stack-id :reader stack-id)

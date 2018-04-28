@@ -23,9 +23,9 @@
     the-stack))
 
 (defun print-kvs (formatter stream data)
-  (mapcar (destructuring-lambda (((_ k) (__ v)))
+  (mapcar (destructuring-lambda (((_ k) (__ . v)))
             (declare (ignore _ __))
-            (funcall formatter stream k v))
+            (funcall formatter stream k (car v)))
           data))
 
 (defun stack-outputs (the-stack)
@@ -113,13 +113,13 @@
 (defmethod (setf stack) :before (new-value (object stack-formatter))
   (setf (old-status object) (stack-status object)))
 
-(defgeneric refresh-stack (stack-formatter)
+(defgeneric refresh (stack-formatter)
   (:method ((stack cloud-watcher.aws-result:stack))
     (stack-for-name (stack-name stack))) 
   (:method ((stack-formatter string))
     (make-instance 'stack-formatter :stack (stack-for-name stack-formatter)))
   (:method ((stack-formatter stack-formatter))
-    (setf (stack stack-formatter) (refresh-stack (stack stack-formatter)))
+    (setf (stack stack-formatter) (refresh (stack stack-formatter)))
     stack-formatter))
 
 (defmethod old-status ((stack cloud-watcher.aws-result:stack))
@@ -138,15 +138,15 @@
           (output-block the-stack)
           t))))
 
-(defun refreshing (refresh-function cb)
-  (lambda (thing)
-    (let ((refreshed-thing (funcall refresh-function thing)))
-      (values (funcall cb refreshed-thing)
-              refreshed-thing))))
+(defmacro refreshing (cb)
+  `(lambda (thing)
+     (let ((refreshed-thing (refresh thing)))
+       (values (,cb refreshed-thing)
+               refreshed-thing))))
 
 (defun watch-stack (name)
   (format t "~&Watching ~s~2%" name)
-  (every-five-seconds (refreshing 'refresh-stack 'stack-info)
+  (every-five-seconds (refreshing stack-info)
                       (list name))
   (fresh-line))
 
