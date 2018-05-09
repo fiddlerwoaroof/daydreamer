@@ -22,18 +22,24 @@
          (the-stack (extract-stack aws-result)))
     the-stack))
 
-(defun print-kvs (formatter stream data)
-  (mapcar (destructuring-lambda (((_ k) (__ . v)))
-            (declare (ignore _ __))
-            (funcall formatter stream k (car v)))
-          data))
+(defun print-kvs (prefix formatter stream data)
+  (let ((key-key (format nil "~aKey" prefix))
+        (value-key (format nil "~aValue" prefix)))
+    (mapcar (lambda (inp)
+              (declare (ignore _ __))
+              (let ((k (cadr (assoc key-key inp :test #'equal)))
+                    (v (cadr (assoc value-key inp :test #'equal))))
+                (funcall formatter stream k v)))
+            data)))
 
 (defun stack-outputs (the-stack)
-  (print-kvs (tagged-kv-formatter "OUTPUT") t
+  (print-kvs "Output"
+             (tagged-kv-formatter "OUTPUT") t
              (outputs the-stack)))
 
 (defun stack-parameters (the-stack)
-  (print-kvs (tagged-kv-formatter "PARAMETERS") t
+  (print-kvs "Parameter"
+             (tagged-kv-formatter "PARAMETERS") t
              (parameters the-stack)))
 
 (defun lt-format (a b &key &allow-other-keys)

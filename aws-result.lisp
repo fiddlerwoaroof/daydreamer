@@ -88,7 +88,7 @@
    (%rollback-configuration :initarg :rollback-configuration :reader rollback-configuration)
    (%drift-information :initarg :drift-information :reader drift-information)
    (%enable-termination-protection :initarg :enable-termination-protection :reader enable-termination-protection)
-   (%parameters :initarg :parameters :reader parameters)))
+   (%parameters :initarg :parameters :reader parameters :initform (list))))
 
 (defclass timeline ()
   ((%start-date-time :initarg :start-date-time :reader start-date-time)
