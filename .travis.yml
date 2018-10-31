@@ -4,9 +4,8 @@ env:
     - "LISP=ccl"
 install:
   - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
-  - git clone https://github.com/fiddlerwoaroof/daydreamer.git
+  - git clone --depth=1 https://github.com/fiddlerwoaroof/daydreamer.git ~/lisp/daydreamer/
 
 script:
-  - cl -e '(load "daydreamer/daydreamer.asd")
-           (ql:quickload :daydreamer)'
+  - cl -e '(ql:quickload :daydreamer)'
 
