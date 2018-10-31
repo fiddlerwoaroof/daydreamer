@@ -7,6 +7,6 @@ install:
   - git clone https://github.com/fiddlerwoaroof/daydreamer.git
 
 script:
-  - cl -e '(load "daydreamer/daydreamer.asd")
+  - cl -e '(load "daydreamer.asd")
            (ql:quickload :daydreamer)'
 
