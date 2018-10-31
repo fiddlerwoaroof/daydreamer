@@ -7,5 +7,5 @@ install:
   - git clone --depth=1 https://github.com/fiddlerwoaroof/daydreamer.git ~/lisp/daydreamer/
 
 script:
-  - cl -e '(ql:quickload :daydreamer)'
+  - cl -e '(ql:quickload :cloud-watcher)'
 
