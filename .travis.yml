@@ -1,0 +1,12 @@
+env:
+  matrix:
+    - "LISP=sbcl"
+    - "LISP=ccl"
+install:
+  - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
+  - git clone https://github.com/fiddlerwoaroof/daydreamer.git
+
+script:
+  - cl -e '(load-file "daydreamer/daydreamer.asd")
+           (ql:quickload :daydreamer)'
+
