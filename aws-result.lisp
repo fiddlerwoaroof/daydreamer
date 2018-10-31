@@ -88,6 +88,7 @@
    (%rollback-configuration :initarg :rollback-configuration :reader rollback-configuration)
    (%drift-information :initarg :drift-information :reader drift-information)
    (%enable-termination-protection :initarg :enable-termination-protection :reader enable-termination-protection)
+   (%template-description :initarg :template-description :reader template-description)
    (%parameters :initarg :parameters :reader parameters :initform (list))))
 
 (defclass timeline ()
@@ -137,8 +138,24 @@
                                  (:rollback-configuration . car)
                                  (:drift-information . car)
                                  (:enable-termination-protection . car)
+                                 (:template-description . car)
                                  (:parameters . extract-list)))))))
 
+(defparameter *stack-statuses*
+  '("CREATE_COMPLETE" "CREATE_IN_PROGRESS" "CREATE_FAILED"
+    "DELETE_COMPLETE" "DELETE_FAILED" "DELETE_IN_PROGRESS"
+    "REVIEW_IN_PROGRESS"
+    "ROLLBACK_COMPLETE" "ROLLBACK_FAILED" "ROLLBACK_IN_PROGRESS"
+    "UPDATE_COMPLETE" "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS" "UPDATE_IN_PROGRESS"
+    "UPDATE_ROLLBACK_COMPLETE" "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS" "UPDATE_ROLLBACK_FAILED" "UPDATE_ROLLBACK_IN_PROGRESS"))
+
+#+nil
+(aws-sdk/services/cloudformation:list-stacks 
+ :stack-status-filter '("UPDATE_COMPLETE" "UPDATE_IN_PROGRESS"
+                        "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS" "UPDATE_ROLLBACK_COMPLETE"
+                        "UPDATE_ROLLBACK_IN_PROGRESS" "UPDATE_ROLLBACK_FAILED" 
+                        "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS" "CREATE_FAILED"
+                        "CREATE_COMPLETE" "CREATE_IN_PROGRESS"))
 
 (defgeneric initialize-date (value)
   (:method ((value cons)) (local-time:parse-timestring (car value)))
@@ -159,3 +176,4 @@
   (should be equal "outputs" (decamelize "Outputs"))
   (should be equal "outputs-outputs" (decamelize "OutputsOutputs"))
   (should be equal "a-b-c" (decamelize "ABC")))
+

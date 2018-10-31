@@ -13,6 +13,7 @@
 (defparameter *cloud-watcher-synopsis*
   (defsynopsis (:postfix "ARGS...")
     (group (:header "actions")
+           (flag :short-name "s" :long-name "stacks" :description "show stack information")
            (flag :short-name "p" :long-name "parameters" :description "show stack parameters")
            (flag :short-name "o" :long-name "outputs" :description "show stack outputs")
            (flag :short-name "w" :long-name "watch" :description "watch a cloudformation stack until it's done processing")
@@ -25,6 +26,17 @@
            (flag :long-name "rebuild")
            (flag :long-name "self-test")
            (flag :long-name "help"))))
+
+(defun stacks-main ()
+  (mapcar (lambda (s)
+            (format t "~3&STACK ~a ~a~2%"
+                    (cloud-watcher.aws-result:stack-name s)
+                    (cloud-watcher.aws-result:stack-status s))
+            (stack-info s))
+          (mapcar 'cloud-watcher.aws-result:extract-stack
+                  (cloud-watcher.aws-result:extract-list
+                   (cdar
+                    (aws/cloudformation:describe-stacks))))))
 
 (defun stack-parameters-main (name)
   (stack-parameters (stack-for-name name)))
@@ -63,6 +75,7 @@
     (cond ((clon:getopt :long-name "help") (clon:help))
           ((clon:getopt :long-name "info") (stack-info-main (car files)))
           ((clon:getopt :long-name "watch") (cloud-watcher.main:watch-stack (car files)))
+          ((clon:getopt :long-name "stacks") (stacks-main))
           ((clon:getopt :long-name "outputs") (stack-outputs-main (car files)))
           ((clon:getopt :long-name "parameters") (stack-parameters-main (car files)))
           ((clon:getopt :long-name "self-test") (run-tests))

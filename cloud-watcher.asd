@@ -17,8 +17,13 @@
                  #:local-time
                  #:local-time-duration
                  #:aws-sdk/services/cloudformation
+                 #:aws-sdk/services/monitoring
                  #:aws-sdk/services/elasticmapreduce
-                 #:should-test)
+                 #:should-test
+                 #:yason
+                 #:hunchentoot
+                 #:data-lens
+                 )
     :serial t
     :components ((:file "aws-result")
                  (:file "main")

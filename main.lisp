@@ -26,10 +26,9 @@
   (let ((key-key (format nil "~aKey" prefix))
         (value-key (format nil "~aValue" prefix)))
     (mapcar (lambda (inp)
-              (declare (ignore _ __))
               (let ((k (cadr (assoc key-key inp :test #'equal)))
                     (v (cadr (assoc value-key inp :test #'equal))))
-                (funcall formatter stream k v)))
+                (format stream formatter k v)))
             data)))
 
 (defun stack-outputs (the-stack)
