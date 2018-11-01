@@ -30,4 +30,6 @@
                                         *my-pathname*))))
    (terpri))
 
-  ((ql:quickload :daydreamer)))
+  ((ql:quickload :daydreamer))
+
+  ((asdf/driver:symbol-call :daydreamer.cli :dump)))

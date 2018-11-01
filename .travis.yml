@@ -1,11 +1,14 @@
 env:
   matrix:
     - "LISP=sbcl"
-    - "LISP=ccl"
+
 install:
   - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
   - git clone --depth=1 https://github.com/fiddlerwoaroof/daydreamer.git ~/lisp/daydreamer/
+  - git clone --depth=1 https://github.com/fiddlerwoaroof/fwoar.lisputils.git ~/lisp/fwoar.lisputils/
+  - git clone --depth=1 https://github.com/pokepay/aws-sdk-lisp.git ~/lisp/aws-sdk-lisp && pushd ~/lisp/aws-sdk-lisp && git checkout 6d1f66e && popd
 
 script:
-  - cl -e '(ql:quickload :cloud-watcher)'
+  - cl -l ~/lisp/daydreamer/build.lisp
+  - ./daydreamer --test
 
