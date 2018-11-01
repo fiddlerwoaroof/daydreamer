@@ -1,10 +1,6 @@
 env:
   matrix:
-  - LISP=sbcl
-cache:
-  directories:
-    - $HOME/.cache/common-lisp
-    - $HOME/quicklisp
+    - LISP=sbcl
 install:
 - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
 - git clone --depth=1 https://github.com/fiddlerwoaroof/daydreamer.git ~/lisp/daydreamer/
