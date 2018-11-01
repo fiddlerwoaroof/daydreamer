@@ -16,18 +16,18 @@
 
 
 
-(define-symbol-macro *my-pathname* 
-    (or *compile-file-pathname*
-        *load-pathname*))
-
 (stepwise
+  ((defun tr (v)
+     (prog1 v
+       (format t "~&tracing: ~s~%" v))))
+
   ((defun load-compile (pn)
      (load (compile-file pn))))
 
   ((princ
     (mapcar 'load-compile
             (directory (merge-pathnames "*.asd"
-                                        *my-pathname*))))
+                                        *load-pathname*))))
    (terpri))
 
   ((ql:quickload :daydreamer))
