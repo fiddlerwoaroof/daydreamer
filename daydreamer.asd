@@ -6,7 +6,7 @@
 
 (defsystem :daydreamer
     :description ""
-    :author "Ed L <edward@elangley.org>"
+    :author "Ed L <gh@elangley.org>"
     :license "MIT"
     :depends-on (#:alexandria
                  #:uiop

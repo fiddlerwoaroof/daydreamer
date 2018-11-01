@@ -1,3 +1,4 @@
+language: common-lisp
 env:
   matrix:
     - LISP=sbcl
