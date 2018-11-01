@@ -3,8 +3,8 @@
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (net.didierverna.clon:nickname-package))
 
-(defpackage :cloud-watcher.main
-  (:use :cl :fw.lu :alexandria :st :cloud-watcher.aws-result)
+(defpackage :daydreamer.main
+  (:use :cl :fw.lu :alexandria :st :daydreamer.aws-result)
   (:export main dump
            #:stack-parameters
            #:stack-outputs
@@ -12,7 +12,7 @@
            #:watch-stack
            #:stack-info))
 
-(in-package :cloud-watcher.main)
+(in-package :daydreamer.main)
 
 (define-condition invalid-result (error)
   ())
@@ -119,7 +119,7 @@
   (setf (old-status object) (stack-status object)))
 
 (defgeneric refresh (stack-formatter)
-  (:method ((stack cloud-watcher.aws-result:stack))
+  (:method ((stack daydreamer.aws-result:stack))
     (stack-for-name (stack-name stack))) 
   (:method ((stack-formatter string))
     (make-instance 'stack-formatter :stack (stack-for-name stack-formatter)))
@@ -127,7 +127,7 @@
     (setf (stack stack-formatter) (refresh (stack stack-formatter)))
     stack-formatter))
 
-(defmethod old-status ((stack cloud-watcher.aws-result:stack))
+(defmethod old-status ((stack daydreamer.aws-result:stack))
   nil)
 
 (defun stack-info (the-stack)

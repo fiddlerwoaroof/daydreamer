@@ -1,4 +1,4 @@
-(defpackage :cloud-watcher.aws-result
+(defpackage :daydreamer.aws-result
   (:use :cl :fw.lu :alexandria :st)
   (:export
    #:stack
@@ -25,7 +25,7 @@
    #:extract-stack
    #:timeline
    #:tagged-kv-formatter))
-(in-package :cloud-watcher.aws-result)
+(in-package :daydreamer.aws-result)
 
 (defun find-all-indices (pred str &optional accum (start (or (car accum) 0)))
   (check-type pred function)
