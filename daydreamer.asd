@@ -4,7 +4,7 @@
 #+sbcl
 (sb-posix:setenv "CC" "clang" 1)
 
-(defsystem :cloud-watcher 
+(defsystem :daydreamer
     :description ""
     :author "Ed L <edward@elangley.org>"
     :license "MIT"
