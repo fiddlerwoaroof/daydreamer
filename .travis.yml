@@ -19,8 +19,7 @@ deploy:
   api_key:
     secure: Nb1DR1mVstN3ojIGS8cxgZ0OAqRBoNX/2PVepNAvYSW/Ds8vsQ4elHDHZHcKhRz1LI/ezooIynE+HQhK0RYepKvt+UsoqoFCmFOZTuIoyCcsV00lA1Y5KGMbwC4JrwIS12Sr/kbHZFGReu7ku6GGA3aiTtaiSVwykYJZru8BBo+DUK1S5ysx+GGu3Ugq2OP+B4gcFJbqZ3QTjr+GTLcwpW4e2XjCaizt8bQwrTgDcm6mZdn0V6+pc5E3DO/jqi1jWi4SG8AcWdH6l3vQ6SwkpDJOF2ILydbKKBN/W7Hi2ezMI8lu1d6Pv4vvjp/+2vmbDXjmXRQjfWsk4py8Fl7TlFVF5U17Kf2+x2prUA3F6mL0W8Yoq1tURIipn+zKoFaD7ukH4VAENjMm2RBw3nwAUOyDwJeCMCkJ6v4ptHMlC4A+8DJc4erNwYZUd/rtLFtpSpGFRQi4GS3MsrK9vsOwchfgFSRasWPMzPr6kBNrTgO++ThZ+tw/wg3D+zEy6og+cVOl/696D/cSA6Mekohmuujjj/3RvxHGar8pUgDm2hoXB50Ur+9W6X6jYrc1IAvddXrXDWd+v0yzeNPT6846xErENRlOPVq/wyGj10iSny9rLfS0qGmluI/dsJ8GMZYLFSdwdBCc7lGTXeLS77vTF5n45erKrxi77JYoVisYyg8=
   file: ~/lisp/daydreamer
+  skip_cleanup: true
   on:
     repo: fiddlerwoaroof/daydreamer
-    branches:
-      only:
-        - master
+    tags: true
