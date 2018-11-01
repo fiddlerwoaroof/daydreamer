@@ -9,6 +9,6 @@ install:
   - git clone --depth=1 https://github.com/pokepay/aws-sdk-lisp.git ~/lisp/aws-sdk-lisp && pushd ~/lisp/aws-sdk-lisp && git checkout 6d1f66e && popd
 
 script:
-  - cd ~/lisp/daydreamer/ && cl -l ~/lisp/daydreamer/build.lisp
+  - cd ~/lisp/daydreamer/ && cl -e '(load "~/lisp/daydreamer/build.lisp")'
   - cd ~/lisp/daydreamer/ && ./daydreamer --test
 
