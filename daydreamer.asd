@@ -22,9 +22,14 @@
                  #:should-test
                  #:yason
                  #:hunchentoot
-                 #:data-lens
-                 )
+                 #:data-lens)
     :serial t
     :components ((:file "aws-result")
                  (:file "main")
                  (:file "cli")))
+
+(defsystem :daydreamer/release
+ :entry-point "daydreamer.cli::main"
+ :output-files (program-op (o c) (list "daydreamer"))
+ :depends-on (:cffi
+   :daydreamer))
