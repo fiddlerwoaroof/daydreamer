@@ -14,24 +14,28 @@
                     ,@x))
                body)))
 
-
+;; #.(progn
+;;     (load "~/quicklisp/setup.lisp")
+;;     nil)
 
 (stepwise
-  ((defun tr (v)
-     (prog1 v
-       (format t "~&tracing: ~s~%" v))))
-
   ((defun load-compile (pn)
      (load (compile-file pn))))
 
+  ((ql:quickload :cffi-grovel))
   ((princ
     (mapcar 'load-compile
-            (directory (merge-pathnames "*.asd"
-                                        *load-pathname*))))
+            (remove #\.
+                    (directory (merge-pathnames "*.asd"
+                                                *load-pathname*)) 
+                    :key 'pathname-name 
+                    :test 'alexandria:starts-with)))
    (terpri))
 
-  ((ql:quickload :daydreamer/release))
+  ((ql:quickload :daydreamer))
 
-  ((asdf:operate :static-program-op :daydreamer/release))
+  ((asdf:operate :static-program-op :daydreamer))
   #+nil
-  ((asdf/driver:symbol-call :daydreamer.cli :dump)))
+  ((asdf/driver:symbol-call :daydreamer.cli :dump))
+  
+  (sb-ext:quit))
