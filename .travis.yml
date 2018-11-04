@@ -15,9 +15,9 @@ install:
   - git clone --depth=1 https://github.com/pokepay/aws-sdk-lisp.git ~/sbcl/quicklisp/local-projects/aws-sdk-lisp && pushd ~/sbcl/quicklisp/local-projects/aws-sdk-lisp && git checkout 6d1f66e && popd
 
 script:
-  - cd ~/sbcl/quicklisp/daydreamer/ && ~/sbcl/bin/sbcl --no-userinit --disable-debugger --load ~/sbcl/quicklisp/setup.lisp --load build.lisp
-  - ls ~/sbcl/quicklisp/daydreamer/
-  - cd ~/sbcl/quicklisp/daydreamer/ && ./daydreamer --self-test
+  - cd ~/sbcl/quicklisp/local-projects/daydreamer/ && ~/sbcl/bin/sbcl --no-userinit --disable-debugger --load ~/sbcl/quicklisp/setup.lisp --load build.lisp
+  - ls ~/sbcl/quicklisp/local-projects/daydreamer/
+  - cd ~/sbcl/quicklisp/local-projects/daydreamer/ && ./daydreamer --self-test
   - rm -rf ~/sbcl/quicklisp/local-projects/*
 
 cache:
