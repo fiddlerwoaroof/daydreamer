@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: packaging
-          command: apt install -y wget build-essential
+          command: apt update && apt install -y wget build-essential
       - run:
           name: pwd?
           command: pwd
