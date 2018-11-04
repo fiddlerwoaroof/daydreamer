@@ -12,9 +12,6 @@ jobs:
           name: install deps
           command: ./clone-all-the-things.sh
       - run:
-          name: setup env
-          command: wget -qO- https://srv2.elangley.org/~edwlan/sbcl-static.tgz|tar vzx 
-      - run:
           name: pwd?
           command: pwd
       - run:
