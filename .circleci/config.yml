@@ -1,5 +1,12 @@
 version: 2
 jobs:
+  foo:
+    docker:
+      - image: debian:stretch
+    steps:
+      - run:
+          name: hi there
+          command: env
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
@@ -38,6 +45,22 @@ workflows:
   main:
     jobs:
       - build
+  tmp:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^testing-\d+$/
+      - foo:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^testing-\d+$/
   release:
     jobs:
       - build:
