@@ -17,3 +17,6 @@ jobs:
       - run:
           name: Greeting
           command: ./make.sh
+      - store_artifacts:
+          path: /root/project/daydreamer
+          destination: ~
