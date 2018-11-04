@@ -1,12 +1,5 @@
 version: 2
 jobs:
-  foo:
-    docker:
-      - image: debian:stretch
-    steps:
-      - run:
-          name: hi there
-          command: env
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
@@ -16,8 +9,7 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            VERSION=
-            env
+            VERSION=${CIRCLE_TAG}
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
   build:
@@ -45,22 +37,6 @@ workflows:
   main:
     jobs:
       - build
-  tmp:
-    jobs:
-      - build:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^testing-\d+$/
-      - foo:
-          requires:
-            - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^testing-\d+$/
   release:
     jobs:
       - build:
