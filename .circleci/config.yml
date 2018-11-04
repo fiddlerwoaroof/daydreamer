@@ -9,11 +9,11 @@ jobs:
           name: packaging
           command: apt update && apt install -y wget build-essential
       - run:
-          name: pwd?
-          command: pwd
+          name: install deps
+          command: ./clone-all-the-things.sh
       - run:
           name: setup env
-          command: wget -O- https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar vzx 
+          command: wget -O- https://srv2.elangley.org/~edwlan/sbcl-static.tgz|tar vzx 
       - run:
           name: pwd?
           command: pwd
