@@ -6,6 +6,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: packaging
+          command: apt install -y wget build-essential
+      - run:
           name: pwd?
           command: pwd
       - run:
