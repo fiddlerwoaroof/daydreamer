@@ -3,14 +3,14 @@ env:
   matrix:
     - LISP=sbcl "ASDF_OUTPUT_TRANSLATIONS=/:" SBCL_HOME=~/sbcl
 install:
-  - pushd ~ && curl -L https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar zx && popd
+  - pushd ~ && curl -L https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar zx && ls && pwd && popd
   - git clone --depth=1 https://gitlab.com/fiddlerwoaroof/osicat.git ~/lisp/osicat.git
   - git clone --depth=1 https://gitlab.com/fiddlerwoaroof/cffi.git ~/lisp/cffi.git
 
   - git clone --depth=1 https://github.com/fiddlerwoaroof/daydreamer.git ~/lisp/daydreamer/
   - git clone --depth=1 https://github.com/fiddlerwoaroof/fwoar.lisputils.git ~/lisp/fwoar.lisputils/
   - git clone --depth=1 https://github.com/fiddlerwoaroof/data-lens.git ~/lisp/data-lens/
-  - git clone --depth=1 https://github.com/pokepay/aws-sdk-lisp.git ~/lisp/aws-sdk-lisp && pushd ~/lisp/aws-sdk-lisp && git checkout 6d1f66e && ls && pwd && popd
+  - git clone --depth=1 https://github.com/pokepay/aws-sdk-lisp.git ~/lisp/aws-sdk-lisp && pushd ~/lisp/aws-sdk-lisp && git checkout 6d1f66e && popd
 script:
   - cd ~/lisp/daydreamer/ && ~/sbcl/bin/sbcl --load ~/lisp/sbcl/quicklisp/setup.lisp --load ~/lisp/daydreamer/build.lisp --quit
   - ls ~/lisp/daydreamer/
