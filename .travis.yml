@@ -2,7 +2,7 @@ language: ruby
 
 env:
   matrix:
-    - LISP=sbcl "ASDF_OUTPUT_TRANSLATIONS=/:" SBCL_HOME=~/sbcl/lib/sbcl/
+    - LISP=sbcl "ASDF_OUTPUT_TRANSLATIONS=/:" SBCL_HOME=~/sbcl/lib/sbcl/ CC=clang
 
 install:
   - pushd ~ && ( [[ -d ~/sbcl ]] || curl -L https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar vzx ) && ls && pwd && popd
