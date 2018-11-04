@@ -3,6 +3,8 @@
   (:export make))
 (in-package :fwoar.build)
 
+#.(progn (ql:quickload :alexandria) nil)
+
 (defmacro eval-always (&body body)
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      ,@body))
@@ -38,4 +40,4 @@
   #+nil
   ((asdf/driver:symbol-call :daydreamer.cli :dump))
   
-  (sb-ext:quit))
+  ((sb-ext:quit)))

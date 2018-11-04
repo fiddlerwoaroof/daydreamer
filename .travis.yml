@@ -1,7 +1,9 @@
 language: ruby
+
 env:
   matrix:
     - LISP=sbcl "ASDF_OUTPUT_TRANSLATIONS=/:" SBCL_HOME=~/sbcl/lib/sbcl/
+
 install:
   - pushd ~ && curl -L https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar zx && ls && pwd && popd
   - git clone --depth=1 https://gitlab.com/fiddlerwoaroof/osicat.git ~/lisp/osicat.git
@@ -11,10 +13,12 @@ install:
   - git clone --depth=1 https://github.com/fiddlerwoaroof/fwoar.lisputils.git ~/lisp/fwoar.lisputils/
   - git clone --depth=1 https://github.com/fiddlerwoaroof/data-lens.git ~/lisp/data-lens/
   - git clone --depth=1 https://github.com/pokepay/aws-sdk-lisp.git ~/lisp/aws-sdk-lisp && pushd ~/lisp/aws-sdk-lisp && git checkout 6d1f66e && popd
+
 script:
-  - cd ~/lisp/daydreamer/ && ~/sbcl/bin/sbcl --disable-lossage-handler --disable-debugger --load ~/lisp/sbcl/quicklisp/setup.lisp --load ~/lisp/daydreamer/build.lisp --quit
+  - cd ~/lisp/daydreamer/ && sbcl --no-userinit --disable-debugger --load ~/quicklisp/setup.lisp --load build.lisp
   - ls ~/lisp/daydreamer/
   - cd ~/lisp/daydreamer/ && ./daydreamer --self-test
+
 deploy:
   provider: releases
   api_key:
