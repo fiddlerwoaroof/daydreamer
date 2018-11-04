@@ -6,8 +6,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Greeting
-          command: echo Hello, world.
+          name: pwd?
+          command: pwd
       - run:
-          name: Print the Current Time
-          command: date
+          name: setup env
+          command: cd $HOME && curl -L https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar vzx 
+      - run:
+          name: pwd?
+          command: pwd
+      - run:
+          name: Greeting
+          command: ./make.sh
