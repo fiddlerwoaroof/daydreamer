@@ -19,4 +19,4 @@ jobs:
           command: ./make.sh
       - store_artifacts:
           path: /root/project/daydreamer
-          destination: /
+          destination: /daydreamer
