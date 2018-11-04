@@ -12,7 +12,7 @@ install:
   - git clone --depth=1 https://github.com/fiddlerwoaroof/data-lens.git ~/lisp/data-lens/
   - git clone --depth=1 https://github.com/pokepay/aws-sdk-lisp.git ~/lisp/aws-sdk-lisp && pushd ~/lisp/aws-sdk-lisp && git checkout 6d1f66e && popd
 script:
-  - cd ~/lisp/daydreamer/ && ~/sbcl/bin/sbcl --load ~/lisp/sbcl/quicklisp/setup.lisp --load ~/lisp/daydreamer/build.lisp --quit
+  - cd ~/lisp/daydreamer/ && ~/sbcl/bin/sbcl --disable-lossage-handler --disable-debugger --load ~/lisp/sbcl/quicklisp/setup.lisp --load ~/lisp/daydreamer/build.lisp --quit
   - ls ~/lisp/daydreamer/
   - cd ~/lisp/daydreamer/ && ./daydreamer --self-test
 deploy:
