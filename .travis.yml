@@ -1,7 +1,7 @@
 language: ruby
 env:
   matrix:
-    - LISP=sbcl "ASDF_OUTPUT_TRANSLATIONS=/:" SBCL_HOME=~/sbcl
+    - LISP=sbcl "ASDF_OUTPUT_TRANSLATIONS=/:" SBCL_HOME=~/sbcl/lib/sbcl/
 install:
   - pushd ~ && curl -L https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar zx && ls && pwd && popd
   - git clone --depth=1 https://gitlab.com/fiddlerwoaroof/osicat.git ~/lisp/osicat.git
