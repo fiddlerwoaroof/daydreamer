@@ -32,6 +32,9 @@ jobs:
       - store_artifacts:
           path: /root/project/daydreamer
           destination: /daydreamer
+      - persist_to_workspace:
+          root: /root/project
+          paths: daydreamer
 workflows:
   version: 2
   main:
