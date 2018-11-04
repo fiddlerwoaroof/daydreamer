@@ -5,7 +5,7 @@ env:
     - LISP=sbcl "ASDF_OUTPUT_TRANSLATIONS=/:" SBCL_HOME=~/sbcl/lib/sbcl/ CC=clang
 
 install:
-  - pushd ~ && ( [[ -d ~/sbcl ]] || curl -L https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar vzx ) && ls && pwd && popd
+  - pushd ~ && curl -L https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar vzx && ls && pwd && popd
   - git clone --depth=1 https://gitlab.com/fiddlerwoaroof/osicat.git ~/sbcl/quicklisp/local-projects/osicat.git
   - git clone --depth=1 https://gitlab.com/fiddlerwoaroof/cffi.git ~/sbcl/quicklisp/local-projects/cffi.git
 
@@ -20,9 +20,6 @@ script:
   - cd ~/sbcl/quicklisp/local-projects/daydreamer/ && ./daydreamer --self-test
   - rm -rf ~/sbcl/quicklisp/local-projects/*
 
-cache:
-  directories:
-    - ~/sbcl/
 deploy:
   provider: releases
   api_key:
