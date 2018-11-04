@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: packaging
-          command: apt update && apt install -y wget build-essential
+          command: apt update && apt install -y wget build-essential git
       - run:
           name: install deps
           command: ./clone-all-the-things.sh
