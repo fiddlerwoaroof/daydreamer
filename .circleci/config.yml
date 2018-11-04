@@ -42,6 +42,8 @@ workflows:
     jobs:
       - build:
           filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /^\d+\.\d+$/
       - publish-github-release:
