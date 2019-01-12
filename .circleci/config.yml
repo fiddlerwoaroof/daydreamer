@@ -14,7 +14,7 @@ jobs:
 
   build:
     docker:
-      - image: debian:stretch
+      - image: fiddlerwoaroof/sbcl-static:lastest
     steps:
       - checkout
       - run:
