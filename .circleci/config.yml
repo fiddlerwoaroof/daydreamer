@@ -27,7 +27,7 @@ jobs:
           name: pwd?
           command: pwd
       - run:
-          name: Greeting
+          name: Make
           command: ./make.sh
       - store_artifacts:
           path: /root/project/daydreamer
