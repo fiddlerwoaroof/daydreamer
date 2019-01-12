@@ -2,8 +2,6 @@
 cd $HOME
 
 pwd
-wget -qO- https://srv2.elangley.org/~edwlan/sbcl-static.tgz | tar vzx 
-
 git clone --depth=1 https://gitlab.com/fiddlerwoaroof/osicat.git ~/sbcl/quicklisp/local-projects/osicat
 git clone --depth=1 https://gitlab.com/fiddlerwoaroof/cffi.git ~/sbcl/quicklisp/local-projects/cffi
 
