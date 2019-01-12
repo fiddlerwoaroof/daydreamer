@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export ASDF_OUTPUT_TRANSLATIONS="/:" SBCL_HOME="$HOME/sbcl/lib/sbcl/" CC="clang"
+export ASDF_OUTPUT_TRANSLATIONS="/:" CC="clang"
 
 env
 
