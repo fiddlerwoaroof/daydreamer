@@ -12,7 +12,7 @@
   :depends-on (#:alexandria
                #:uiop
                #:serapeum
-               #:fwoar.lisputils
+               #:fwoar-lisputils
                #:net.didierverna.clon
                #:cl-base64
                #:local-time
