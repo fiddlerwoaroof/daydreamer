@@ -14,7 +14,7 @@ jobs:
 
   build:
     docker:
-      - image: fiddlerwoaroof/sbcl-static:latest
+      - image: fiddlerwoaroof/sbcl-static:testing
     steps:
       - checkout
       - run:
