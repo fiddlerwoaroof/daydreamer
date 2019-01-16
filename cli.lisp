@@ -67,6 +67,7 @@
     (clon:dump "daydreamer" main)))
 
 (defun main ()
+  (cl+ssl:reload)
   (let* ((context (net.didierverna.clon:make-context :synopsis *daydreamer-synopsis*))
          (files (clon:remainder :context context))
          (region (clon:getopt :long-name "aws-region"))
