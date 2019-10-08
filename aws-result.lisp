@@ -91,6 +91,15 @@
    (%template-description :initarg :template-description :reader template-description)
    (%parameters :initarg :parameters :reader parameters :initform (list))))
 
+(defmethod initialize-instance ((instance stack) &rest initargs &key &allow-other-keys)
+  (let ((available-initargs (alexandria:mappend 'closer-mop:slot-definition-initargs
+                                                (closer-mop:class-slots (find-class 'stack)))))
+    (apply #'call-next-method
+           instance
+           (loop for (key value) on initargs by #'cddr
+                 when (member key available-initargs)
+                   nconc (list key value)))))
+
 (defclass timeline ()
   ((%start-date-time :initarg :start-date-time :reader start-date-time)
    (%end-date-time :initarg :end-date-time :reader end-date-time)
@@ -113,11 +122,16 @@
                                       aws-result)
                               (make-hash-table)))))
 
-(defun extract-list (aws-result)
-  (mapcar (destructuring-lambda ((list-item-marker . items))
-            (if (string= list-item-marker "member")
-                items
-                (error 'invalid-result)))
+(defun extract-list (aws-result &optional (extractor 'identity))
+  (mapcan (alexandria:compose (lambda (v)
+                                (loop (restart-case (return (list (funcall extractor v)))
+                                        (skip ()
+                                          :report "Skip current item"
+                                          (return ())))))
+                              (destructuring-lambda ((list-item-marker . items))
+                                (if (string= list-item-marker "member")
+                                    items
+                                    (error 'invalid-result))))
           aws-result))
 
 (defun extract-stack (aws-result)

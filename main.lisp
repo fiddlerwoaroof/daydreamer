@@ -1,8 +1,5 @@
 ;; MIT license Edward Langley (c) 2018
 
-(eval-when (:execute :load-toplevel :compile-toplevel)
-  (net.didierverna.clon:nickname-package))
-
 (defpackage :daydreamer.main
   (:use :cl :fw.lu :alexandria :st :daydreamer.aws-result)
   (:export main dump

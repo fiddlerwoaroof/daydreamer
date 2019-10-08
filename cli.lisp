@@ -1,3 +1,6 @@
+(eval-when (:execute :load-toplevel :compile-toplevel)
+  (net.didierverna.clon:nickname-package))
+
 (defpackage :daydreamer.cli
   (:import-from :daydreamer.main :stack-parameters :stack-outputs :stack-for-name :stack-info)
   (:import-from :daydreamer.aws-result :start-date-time :end-date-time)
@@ -71,7 +74,7 @@
   (let* ((context (net.didierverna.clon:make-context :synopsis *daydreamer-synopsis*))
          (files (clon:remainder :context context))
          (region (clon:getopt :long-name "aws-region"))
-         (aws-sdk/api:*session* (aws-sdk/session:make-session :region region)))
+         (aws-sdk:*session* (aws-sdk:make-session :region region)))
 
     (format *error-output* "~&IN REGION: ~a~%" region)
 
@@ -84,6 +87,6 @@
           ((clon:getopt :long-name "self-test") (run-tests))
           ((clon:getopt :long-name "rebuild")
            (load (compile-file (load-time-value
-                                 (asdf:system-relative-pathname :daydreamer "cli.lisp"))))
+                                (asdf:system-relative-pathname :daydreamer "cli.lisp"))))
            (dump)))))
 
