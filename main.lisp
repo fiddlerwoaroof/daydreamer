@@ -1,7 +1,7 @@
 ;; MIT license Edward Langley (c) 2018
 
 (defpackage :daydreamer.main
-  (:use :cl :fw.lu :alexandria :st :daydreamer.aws-result)
+  (:use :cl :fw.lu :alexandria :daydreamer.aws-result)
   (:export main dump
            #:stack-parameters
            #:stack-outputs
@@ -35,7 +35,7 @@
 
 (defun stack-parameters (the-stack)
   (print-kvs "Parameter"
-             (tagged-kv-formatter "PARAMETERS") t
+             (tagged-kv-formatter "PARAMETER") t
              (parameters the-stack)))
 
 (defun lt-format (a b &key &allow-other-keys)
@@ -48,10 +48,11 @@
 
 (defun every-five-seconds (cb args &optional (delay-function #'sleep))
   (loop
-     for (continue? . next-args) = (multiple-value-list (apply cb args)) then (multiple-value-list (apply cb next-args))
-     while continue?
-     do (funcall delay-function 5)))
+    for (continue? . next-args) = (multiple-value-list (apply cb args)) then (multiple-value-list (apply cb next-args))
+    while continue?
+    do (funcall delay-function 5)))
 
+#+(or)
 (deftest every-five-seconds ()
   (let ((counter 0)
         delay)
@@ -85,6 +86,23 @@
               counters)
       (should be = 5 delay))))
 
+(defun resource-block (the-stack)
+  (format t "~& RESOURCES ~%============~%")
+  (let ((resources (daydreamer.aws-result:extract-list
+                    (serapeum:assocdr "StackResources"
+                                      (aws/cloudformation:describe-stack-resources
+                                       :stack-name (stack-name the-stack))
+                                      :test 'equal)
+                    'daydreamer.aws-result:extract-stack-resource)))
+    (loop for resource in resources
+          do (format t "RESOURCE ~a (~a) ~a ~a~:[~;~%~:*~4t~a~]~%"
+                     (logical-resource-id resource)
+                     (resource-type resource)
+                     (resource-status resource)
+                     (physical-resource-id resource)
+                     (resource-status-reason resource))))
+  (format t "~&============~2%"))
+
 (defun parameter-block (the-stack)
   (format t "~& PARAMETERS ~%============~%")
   (stack-parameters the-stack)
@@ -99,6 +117,10 @@
 (defclass stack-formatter ()
   ((%stack :initarg :stack :accessor stack)
    (%old-status :initarg :old-status :accessor old-status :initform nil)))
+
+(defmethod stack-name ((stack-formatter stack-formatter))
+  (when (slot-boundp stack-formatter '%stack)
+    (stack-status (stack stack-formatter))))
 
 (defmethod stack-status ((stack-formatter stack-formatter))
   (when (slot-boundp stack-formatter '%stack)
@@ -117,7 +139,7 @@
 
 (defgeneric refresh (stack-formatter)
   (:method ((stack daydreamer.aws-result:stack))
-    (stack-for-name (stack-name stack))) 
+    (stack-for-name (stack-name stack)))
   (:method ((stack-formatter string))
     (make-instance 'stack-formatter :stack (stack-for-name stack-formatter)))
   (:method ((stack-formatter stack-formatter))
@@ -127,28 +149,34 @@
 (defmethod old-status ((stack daydreamer.aws-result:stack))
   nil)
 
-(defun stack-info (the-stack)
+(defun stack-info (the-stack status parameters outputs &optional (resources nil))
   (with-accessors ((old-status old-status)) the-stack
     (let* ((current-status (stack-status the-stack)))
       (unless old-status
-        (parameter-block the-stack))
+        (when parameters
+          (parameter-block the-stack)))
 
       (unless (equal old-status current-status)
-        (format t "~&STATUS ~a~%" current-status))
+        (when status
+          (format t "~&STATUS ~a~%" current-status)))
+
+      (when resources
+        (terpri)
+        (resource-block the-stack))
 
       (if (ends-with-subseq "COMPLETE" (symbol-name current-status))
-          (output-block the-stack)
+          (when outputs
+            (output-block the-stack))
           t))))
 
-(defmacro refreshing (cb)
+(defmacro refreshing (cb &rest args)
   `(lambda (thing)
      (let ((refreshed-thing (refresh thing)))
-       (values (,cb refreshed-thing)
+       (values (,cb refreshed-thing ,@args)
                refreshed-thing))))
 
 (defun watch-stack (name)
   (format t "~&Watching ~s~2%" name)
-  (every-five-seconds (refreshing stack-info)
+  (every-five-seconds (refreshing stack-info t t t)
                       (list name))
   (fresh-line))
-

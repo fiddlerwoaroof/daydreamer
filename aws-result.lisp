@@ -1,31 +1,42 @@
 (defpackage :daydreamer.aws-result
-  (:use :cl :fw.lu :alexandria :st)
-  (:export
-   #:stack
-   #:outputs
-   #:reader
-   #:creation-time
-   #:notification-arns
-   #:stack-id
-   #:stack-name
-   #:description
-   #:stack-status
-   #:disable-rollback
-   #:tags
-   #:deletion-time
-   #:rollback-configuration
-   #:drift-information
-   #:enable-termination-protection
-   #:parameters
-   #:start-date-time
-   #:end-date-time
-   #:creation-date-time
-   #:extract-timeline
-   #:extract-list
-   #:extract-stack
-   #:timeline
-   #:tagged-kv-formatter))
+  (:use :cl :fw.lu :alexandria)
+  (:export #:stack
+           #:outputs
+           #:reader
+           #:creation-time
+           #:notification-arns
+           #:stack-id
+           #:stack-name
+           #:description
+           #:stack-status
+           #:disable-rollback
+           #:tags
+           #:deletion-time
+           #:rollback-configuration
+           #:drift-information
+           #:enable-termination-protection
+           #:parameters
+           #:start-date-time
+           #:end-date-time
+           #:creation-date-time
+           #:extract-timeline
+           #:extract-list
+           #:extract-stack
+           #:timeline
+           #:tagged-kv-formatter
+           #:extract-stack-resource
+           #:stack-resource
+           #:physical-resource-id
+           #:resource-status
+           #:logical-resource-id
+           #:timestamp
+           #:resource-type
+           #:resource-status-reason))
 (in-package :daydreamer.aws-result)
+
+(defgeneric stack-name (stack)
+  (:method ((stack string))
+    stack))
 
 (defun find-all-indices (pred str &optional accum (start (or (car accum) 0)))
   (check-type pred function)
@@ -158,16 +169,18 @@
 (defparameter *stack-statuses*
   '("CREATE_COMPLETE" "CREATE_IN_PROGRESS" "CREATE_FAILED"
     "DELETE_COMPLETE" "DELETE_FAILED" "DELETE_IN_PROGRESS"
-    "REVIEW_IN_PROGRESS"
-    "ROLLBACK_COMPLETE" "ROLLBACK_FAILED" "ROLLBACK_IN_PROGRESS"
-    "UPDATE_COMPLETE" "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS" "UPDATE_IN_PROGRESS"
-    "UPDATE_ROLLBACK_COMPLETE" "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS" "UPDATE_ROLLBACK_FAILED" "UPDATE_ROLLBACK_IN_PROGRESS"))
+    "REVIEW_IN_PROGRESS" "ROLLBACK_COMPLETE" "ROLLBACK_FAILED"
+    "ROLLBACK_IN_PROGRESS" "UPDATE_COMPLETE"
+    "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS" "UPDATE_IN_PROGRESS"
+    "UPDATE_ROLLBACK_COMPLETE"
+    "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS"
+    "UPDATE_ROLLBACK_FAILED" "UPDATE_ROLLBACK_IN_PROGRESS"))
 
 #+nil
-(aws-sdk/services/cloudformation:list-stacks 
+(aws-sdk/services/cloudformation:list-stacks
  :stack-status-filter '("UPDATE_COMPLETE" "UPDATE_IN_PROGRESS"
                         "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS" "UPDATE_ROLLBACK_COMPLETE"
-                        "UPDATE_ROLLBACK_IN_PROGRESS" "UPDATE_ROLLBACK_FAILED" 
+                        "UPDATE_ROLLBACK_IN_PROGRESS" "UPDATE_ROLLBACK_FAILED"
                         "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS" "CREATE_FAILED"
                         "CREATE_COMPLETE" "CREATE_IN_PROGRESS"))
 
@@ -183,11 +196,47 @@
           s-edt (initialize-date s-edt)
           s-cdt (initialize-date s-cdt))))
 
+(defclass stack-resource ()
+  ((%physical-resource-id :initarg :physical-resource-id :reader physical-resource-id)
+   (%resource-status :initarg :resource-status :reader resource-status)
+   (%resource-status-reason :initarg :resource-status-reason :reader resource-status-reason :initform nil)
+   (%stack-id :initarg :stack-id :reader stack-id)
+   (%stack-name :initarg :stack-name :reader stack-name)
+   (%drift-information :initarg :drift-information :reader drift-information)
+   (%logical-resource-id :initarg :logical-resource-id :reader logical-resource-id)
+   (%timestamp :initarg :timestamp :reader timestamp)
+   (%resource-type :initarg :resource-type :reader resource-type)))
 
+(defmethod print-object ((o stack-resource) s)
+  (print-unreadable-object (o s :type t :identity t)
+    (format s "~a (~a): ~a"
+            (logical-resource-id o)
+            (resource-type o)
+            (resource-status o))))
+
+(defun extract-stack-resource (it)
+  (apply 'make-instance 'daydreamer.aws-result::stack-resource
+         (daydreamer.aws-result::alist-to-initargs
+          it (fw.lu:alist-string-hash-table
+              `((:physical-resource-id . car)
+                (:resource-status . car)
+                (:resource-status-reason . car)
+                (:stack-id . car)
+                (:stack-name . car)
+                (:drift-information . car)
+                (:logical-resource-id . car)
+                (:timestamp . car)
+                (:resource-type . car))))))
+
+(defclass stack-template ()
+  ((template-body :initarg :template-body :reader template-body)
+   (stages-available :initarg :stages-available :reader stages-available)))
+
+
+#+(or)
 (deftest decamelize ()
   (should be equal "a" (decamelize "A"))
   (should be equal "a" (decamelize "a"))
   (should be equal "outputs" (decamelize "Outputs"))
   (should be equal "outputs-outputs" (decamelize "OutputsOutputs"))
   (should be equal "a-b-c" (decamelize "ABC")))
-

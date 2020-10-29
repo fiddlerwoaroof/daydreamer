@@ -21,23 +21,25 @@
 ;;     nil)
 
 (stepwise
-  ((defun load-compile (pn)
-     (load (compile-file pn))))
+ ((defun load-compile (pn)
+    (load (compile-file pn))))
 
-  ((ql:quickload :cffi-grovel))
-  ((princ
-    (mapcar 'load-compile
-            (remove #\.
-                    (directory (merge-pathnames "*.asd"
-                                                *load-pathname*)) 
-                    :key 'pathname-name 
-                    :test 'alexandria:starts-with)))
-   (terpri))
+ ((ql:quickload :cffi-grovel))
+ ((princ
+   (mapcar 'load-compile
+           (remove #\.
+                   (directory (merge-pathnames "*.asd"
+                                               *load-pathname*))
+                   :key 'pathname-name
+                   :test 'alexandria:starts-with)))
+  (terpri))
 
-  ((ql:quickload :daydreamer))
+ ((ql:quickload :daydreamer))
 
-  ((asdf:operate :static-program-op :daydreamer))
-  #+nil
-  ((asdf/driver:symbol-call :daydreamer.cli :dump))
-  
-  ((sb-ext:quit)))
+ #+linux
+ ((asdf:operate :static-program-op :daydreamer))
+
+ #-linux
+ ((uiop:symbol-call :daydreamer.cli :dump))
+
+ ((sb-ext:quit)))
