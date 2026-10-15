@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   publish-github-release:
     docker:
@@ -36,7 +36,6 @@ jobs:
           root: /root/project
           paths: daydreamer
 workflows:
-  version: 2
   main:
     jobs:
       - build
